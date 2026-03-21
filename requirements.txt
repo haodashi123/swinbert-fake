@@ -1,0 +1,14 @@
+streamlit
+pandas
+numpy
+plotly
+networkx
+faker
+requests
+tqdm
+transformers
+torchvision
+scikit-learn
+fastapi
+uvicorn
+python-multipart
