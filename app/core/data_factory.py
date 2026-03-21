@@ -7,6 +7,7 @@ import random
 from datetime import datetime, timedelta
 import torch
 import os
+from pathlib import Path
 
 def set_seed(seed=2026):
     random.seed(seed)
@@ -27,11 +28,14 @@ class MockDataLoader:
         """
         加载 Fakeddit 测试集样本
         """
-        file_path = "fakeddit_multimodal_only_samples/multimodal_test_public.tsv"
+        repo_root = Path(__file__).resolve().parents[2]
+        csv_path = repo_root / "data" / "dataset_test.csv"
+        tsv_path = repo_root / "fakeddit_multimodal_only_samples" / "multimodal_test_public.tsv"
         try:
-            # 读取 TSV
-            # on_bad_lines='skip' 防止格式错误行导致崩溃
-            df = pd.read_csv(file_path, sep='\t', on_bad_lines='skip')
+            if csv_path.exists():
+                df = pd.read_csv(str(csv_path), on_bad_lines="skip")
+            else:
+                df = pd.read_csv(str(tsv_path), sep="\t", on_bad_lines="skip")
             
             # 随机采样 n 条
             if len(df) > n:
@@ -60,7 +64,7 @@ class MockDataLoader:
                 
                 # Label: 1 (Real) or 0 (Fake). Handle potential parsing errors.
                 try:
-                    label = int(row.get('2_way_label', 0))
+                    label = int(row.get("2_way_label", 0))
                 except:
                     label = 0
                 
