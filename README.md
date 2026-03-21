@@ -179,4 +179,4 @@ This project implements ideas from recent research in Multi-Modal Fake News Dete
 ---
 **Developer**: Zhao Yihao
 **Version**: v3.0 (Academic Edition)
-**Date**: 2026-01-08
+**Date**: 2026-03-21
