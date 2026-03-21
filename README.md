@@ -1,10 +1,11 @@
-# Multi-Modal Information Governance & Visualization Platform
-(突发事件信息失序治理与可视化平台)
+# SwinBERT-Fake: Boosting Multimodal Fake News Detection via Hierarchical Visual Modeling and Explainable AI
 
 ## 📖 Project Overview
-This platform is a comprehensive system designed for the governance and visualization of "information disorder" (rumors, fake news) in breaking events. It leverages a **Multi-Modal Tri-Stream Fusion Model** to detect the veracity of social media content (Text + Image + Caption) in real-time.
+This repository contains the code and dataset split used in our IJCNN submission:
 
-A key focus of this version (v3.0) is the **Comparative Analysis** between advanced visual backbones (**Swin Transformer**) and standard baselines (**ViT**), supported by a rigorous **Interpretability Framework** that demystifies model decisions from the fusion layer down to pixel/token levels.
+**SwinBERT-Fake: Boosting Multimodal Fake News Detection via Hierarchical Visual Modeling and Explainable AI**
+
+It implements a multimodal fake news detector (Text + Image + Caption) with interpretability (SHAP + visual/text attributions) and includes fixed train/val/test CSV splits for reproducibility.
 
 ## 🚀 Core Features
 
@@ -33,13 +34,11 @@ We implement a "Top-Down" explanation pipeline that answers *why* a decision was
     *   **Target**: BERT Word Embeddings.
     *   **Function**: Computes the integral of gradients from the input embedding layer to the final output, assigning precise importance scores to every word (token) in the input text.
 
-### 3. "Swin-Win" Case Discovery
-An automated mining tool that scans the test dataset to identify "Hard Samples" — specific cases where the Baseline (ViT) fails but Our Model (Swin) succeeds. This serves as empirical evidence of the Swin Transformer's robustness in complex scenarios.
-
-### 4. Situational Awareness Dashboard
-*   Real-time monitoring of information disorder trends.
-*   Social network propagation graphs.
-*   Risk distribution and word cloud analysis.
+### 3. Dataset Splits (Reproducibility)
+We provide fixed CSV split files containing sample `id`, `image_url`, text fields, and labels:
+* `data/dataset_train.csv`
+* `data/dataset_val.csv`
+* `data/dataset_test.csv`
 
 ## ⚙️ Detection Logic & User Flow (`views/detection.py`)
 
@@ -47,8 +46,7 @@ The Detection page is the core interactive interface, designed with an "Academic
 
 **1. Input Processing**
 *   **Manual Mode**: Users can enter text and upload an image directly.
-*   **Dataset Mode**: Users can select samples from the Fakeddit dataset.
-*   **Smart Filter**: The "Find 'Swin-Win' Cases" button automatically scans the test set to find samples where Swin is correct but ViT is wrong, demonstrating the model's superiority.
+*   **Dataset Mode**: Users can select samples from the provided CSV split files.
 
 **2. Inference Pipeline**
 When "Execute Analysis" is clicked, the `RealTimeDetector` performs:
@@ -69,7 +67,7 @@ When "Execute Analysis" is clicked, the `RealTimeDetector` performs:
 ### 1. Feature Extraction (Offline)
 To ensure training efficiency on limited hardware (e.g., RTX 3050 4GB), we adopt a "Frozen Backbone" strategy where features are pre-computed.
 
-*   **Script**: `tools/extract_features.py`
+*   **Script**: `scripts/tools/extract_features.py`
 *   **Batch Size**: 16 (Optimized for 4GB VRAM stability)
 *   **Backbones (Frozen)**:
     *   **Text**: `bert-base-uncased` (Output: `[CLS]` token, 768-dim)
@@ -84,7 +82,7 @@ To ensure training efficiency on limited hardware (e.g., RTX 3050 4GB), we adopt
 ### 2. Fusion Network Training
 We train a lightweight Multi-Layer Perceptron (MLP) on top of the frozen features.
 
-*   **Script**: `tools/train_model.py`
+*   **Script**: `scripts/train_model.py`
 *   **Architecture**:
     *   **Input**: Concatenated vectors (e.g., Text 768 + Swin 1024 = 1792 dim).
     *   **Hidden Layer**: Linear(1792 -> 512) -> ReLU -> Dropout(0.5).
@@ -101,7 +99,7 @@ We train a lightweight Multi-Layer Perceptron (MLP) on top of the frozen feature
 ### 3. Model Evaluation
 Comprehensive performance assessment beyond simple accuracy.
 
-*   **Script**: `tools/evaluate_model.py`
+*   **Script**: `scripts/tools/evaluate_model.py`
 *   **Metrics**:
     *   **Accuracy**: Overall correctness.
     *   **Precision/Recall/F1**: Weighted average to handle potential class imbalance.
@@ -128,17 +126,11 @@ All experiments were conducted on a workstation equipped with the following hard
 ```
 info_governance_platform/
 ├── app/                    # Streamlit Application (Front-end & Inference)
-├── app_v2/                 # New Version / Workspace for modifications
-│   ├── app.py              # New Entry Point
-│   ├── models/             # Contains model_text_image_swin.pth
-│   └── ...
 ├── scripts/                # Developer & Research Tools
 │   ├── train_model.py      # Training Script for MLP heads
 │   ├── check_gpu.py        # CUDA/GPU Diagnostic Utility
 │   └── tools/              # Benchmarking & Data Processing Scripts
-├── data/                   # Dataset & Extracted Features (Excluded from Git)
-├── models/                 # Pre-trained Model Checkpoints
-├── outputs/                # Generated Plots & Reports
+├── data/                   # Dataset split CSVs (included)
 ├── README.md               # Documentation
 └── requirements.txt        # Python Dependencies
 ```
@@ -152,9 +144,13 @@ pip install -r requirements.txt
 
 ### 2. Run the Platform
 ```bash
-streamlit run app/app.py
+streamlit run app/main.py
 ```
 Access the dashboard at `http://localhost:8501`.
+
+### 3. Notes
+* Model checkpoints (`models/*.pth`) are not committed to this repository. If you want to run the full inference pipeline, place the corresponding checkpoints under `models/` or train them using the provided scripts.
+* Image files are not bundled. The dataset split files include `image_url`, and images can be downloaded on demand.
 
 ### 3. (Optional) Reproduce Experiments
 1.  **Extract Features**:
