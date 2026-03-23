@@ -46,7 +46,7 @@ The Detection page is the core interactive interface, designed with an "Academic
 
 **1. Input Processing**
 *   **Manual Mode**: Users can enter text and upload an image directly.
-*   **Dataset Mode**: Users can select samples from the provided CSV split files.
+*   **Dataset Mode**: The Streamlit demo loads sample entries from Fakeddit **`multimodal_test_public.tsv`** (under `fakeddit_multimodal_only_samples/`) and randomly samples a small subset for interactive analysis. This demo dataset is only for UI demonstration and qualitative inspection, and is not the dataset split used to produce the reported experimental results.
 
 **2. Inference Pipeline**
 When "Execute Analysis" is clicked, the `RealTimeDetector` performs:
